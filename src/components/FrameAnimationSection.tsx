@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 
-const FRAME_COUNT = 64;
+const FRAME_COUNT = 240;
 const SECTION_HEIGHT = "200vh";
 const BG_COLOR = "#eef4f0";
 
