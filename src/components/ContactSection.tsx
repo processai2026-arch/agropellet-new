@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { fadeUp, viewportOnce, easeSoft } from "@/lib/motion";
+import { useToast } from "@/hooks/use-toast";
 
 const formContainer = {
   hidden: {},
@@ -16,11 +17,27 @@ const formItem = {
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const text = `Name: ${formData.name}%0APhone: ${formData.phone}%0AEmail: ${formData.email}%0AMessage: ${formData.message}`;
+    setIsSubmitting(true);
+
+    // Build the WhatsApp message
+    const text = `🌿 *New Enquiry from Website*%0A%0A*Name:* ${formData.name}%0A*Phone:* ${formData.phone}%0A*Email:* ${formData.email}%0A*Message:* ${formData.message}`;
+    
+    // Open WhatsApp with the message (sends to owner's number)
     window.open(`https://wa.me/919940099060?text=${text}`, "_blank");
+
+    // Show success popup to the user
+    toast({
+      title: "Message Sent Successfully!",
+      description: "We have received your message and will contact you within 2 hours.",
+    });
+
+    setIsSubmitting(false);
+    setFormData({ name: "", phone: "", email: "", message: "" });
   };
 
   return (
@@ -158,9 +175,10 @@ const ContactSection = () => {
               <Button
                 type="submit"
                 size="lg"
+                disabled={isSubmitting}
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl py-6 text-base"
               >
-                Send via WhatsApp
+                {isSubmitting ? "Sending..." : "Send Message"}
               </Button>
             </motion.div>
           </motion.form>

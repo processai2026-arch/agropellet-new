@@ -4,7 +4,8 @@ import type { Variants } from "framer-motion";
 export const easeFluid = [0.16, 1, 0.3, 1] as const;
 export const easeSoft = [0.25, 0.1, 0.25, 1] as const;
 
-export const viewportOnce = { once: true, margin: "-10%" } as const;
+export const viewportOnce = { once: false, margin: "-10%" } as const;
+
 
 export const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },

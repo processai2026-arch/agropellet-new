@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Phone, Leaf } from "lucide-react";
+import { Menu, X, Phone } from "lucide-react";
+import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
@@ -29,9 +30,20 @@ const Navbar = () => {
   return (
     <>
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-background/95 backdrop-blur-lg shadow-sm' : 'bg-background/80 backdrop-blur-lg'} border-b border-border`}>
-        <div className="container mx-auto flex items-center justify-between h-14 sm:h-16 px-4">
+        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 flex items-center justify-between h-14 sm:h-16">
           <a href="#" className="flex items-center gap-2">
-            <Leaf className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
+            <svg width="0" height="0" className="absolute">
+              <filter id="remove-white" color-interpolation-filters="sRGB">
+                <feColorMatrix in="SourceGraphic" type="matrix" values="
+                  1 0 0 0 0
+                  0 1 0 0 0
+                  0 0 1 0 0
+                  -1 -1 -1 0 3
+                " result="colorMask" />
+                <feComposite in="colorMask" in2="SourceGraphic" operator="in" />
+              </filter>
+            </svg>
+            <img src={logo} alt="Agro Power Pellet Logo" className="h-8 w-auto sm:h-10" style={{ filter: "url(#remove-white)" }} />
             <span className="font-display text-lg sm:text-xl font-bold text-foreground">
               Agro Power Pellet
             </span>
