@@ -1,5 +1,8 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { fadeUp, staggerFast, parallaxCard, parallaxImage, viewportOnce } from "@/lib/motion";
+import { getImageSrc } from "@/lib/image-helper";
 import sawDust from "@/assets/products/saw-dust.jpg";
 import coffeeHusk from "@/assets/products/coffee-husk.jpg";
 import riceHusk from "@/assets/products/rice-husk.jpg";
@@ -62,7 +65,7 @@ const ProductsSection = () => {
               <div className="aspect-square overflow-hidden bg-muted/50">
                 <motion.img
                   variants={parallaxImage}
-                  src={p.img}
+                  src={getImageSrc(p.img)}
                   alt={`${p.name} - biomass fuel product`}
                   loading="lazy"
                   width={1024}

@@ -1,3 +1,5 @@
+"use client";
+
 import { Factory, UtensilsCrossed, Shirt, Blocks, Droplets, Wheat } from "lucide-react";
 import { motion } from "framer-motion";
 import { fadeUp, staggerContainer, slideFromLeft, slideFromRight, slideFromBottom, viewportOnce } from "@/lib/motion";

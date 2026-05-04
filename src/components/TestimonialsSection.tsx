@@ -1,3 +1,5 @@
+"use client";
+
 import { Star, Quote } from "lucide-react";
 import { motion } from "framer-motion";
 import { fadeUp, staggerContainer, cardItem, viewportOnce } from "@/lib/motion";

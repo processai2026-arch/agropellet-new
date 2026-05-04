@@ -1,3 +1,5 @@
+"use client";
+
 import { Flame, TrendingDown, Leaf, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 import { fadeUp, staggerSlow, solutionCard, cornerShape, viewportOnce } from "@/lib/motion";

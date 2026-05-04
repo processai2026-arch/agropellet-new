@@ -1,3 +1,5 @@
+"use client";
+
 import { Truck, Link, BarChart3, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { blurFocus, blurFocusContainer, viewportOnce } from "@/lib/motion";

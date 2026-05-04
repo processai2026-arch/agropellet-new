@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef, useEffect, useState } from "react";
 
 const FRAME_COUNT = 240;
@@ -15,16 +17,40 @@ const FrameAnimationSection = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
-  /* ── Preload all 64 frames on mount ─────────────────────────── */
+  /* ── Check if section is in viewport before loading ─────────── */
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: '200px' }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  /* ── Preload frames only when section is visible ─────────────── */
+  useEffect(() => {
+    if (!isVisible) return;
+    
     let cancelled = false;
 
     const preload = async () => {
       const imgs: HTMLImageElement[] = [];
 
+      // Load first 10 frames immediately for smooth start
+      const priorityFrames = Array.from({ length: Math.min(10, FRAME_COUNT) }, (_, i) => i);
       await Promise.all(
-        Array.from({ length: FRAME_COUNT }, (_, i) => {
+        priorityFrames.map((i) => {
           return new Promise<void>((resolve) => {
             const img = new Image();
             img.src = frameSrc(i + 1);
@@ -32,14 +58,34 @@ const FrameAnimationSection = () => {
               imgs[i] = img;
               resolve();
             };
-            img.onerror = () => resolve(); // gracefully skip broken frames
+            img.onerror = () => resolve();
+          });
+        })
+      );
+
+      if (!cancelled) {
+        setImages([...imgs]);
+        setLoaded(true);
+      }
+
+      // Load remaining frames in background
+      const remainingFrames = Array.from({ length: FRAME_COUNT - 10 }, (_, i) => i + 10);
+      await Promise.all(
+        remainingFrames.map((i) => {
+          return new Promise<void>((resolve) => {
+            const img = new Image();
+            img.src = frameSrc(i + 1);
+            img.onload = () => {
+              imgs[i] = img;
+              resolve();
+            };
+            img.onerror = () => resolve();
           });
         })
       );
 
       if (!cancelled) {
         setImages(imgs);
-        setLoaded(true);
       }
     };
 
@@ -47,7 +93,7 @@ const FrameAnimationSection = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isVisible]);
 
   /* ── Draw the correct frame based on scroll position ────────── */
   useEffect(() => {

@@ -1,13 +1,16 @@
+"use client";
+
 import { ArrowRight, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CountUp from "@/components/CountUp";
 import heroBg from "@/assets/hero-bg.jpg";
+import { getImageSrc } from "@/lib/image-helper";
 
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <img
-        src={heroBg}
+        src={getImageSrc(heroBg)}
         alt="Biomass field with industrial plant"
         className="absolute inset-0 w-full h-full object-cover"
         width={1920}

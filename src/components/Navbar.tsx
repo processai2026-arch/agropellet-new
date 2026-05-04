@@ -1,7 +1,10 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Menu, X, Phone } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.jpg";
 import { Button } from "@/components/ui/button";
+import { getImageSrc } from "@/lib/image-helper";
 
 const navLinks = [
   { label: "About", href: "#about" },
@@ -43,7 +46,7 @@ const Navbar = () => {
                 <feComposite in="colorMask" in2="SourceGraphic" operator="in" />
               </filter>
             </svg>
-            <img src={logo} alt="Agro Power Pellet Logo" className="h-8 w-auto sm:h-10" style={{ filter: "url(#remove-white)" }} />
+            <img src={getImageSrc(logo)} alt="Agro Power Pellet Logo" width={200} height={200} className="h-8 w-auto sm:h-10" style={{ filter: "url(#remove-white)" }} />
             <span className="font-display text-lg sm:text-xl font-bold text-foreground">
               Agro Power Pellet
             </span>

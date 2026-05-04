@@ -1,3 +1,5 @@
+"use client";
+
 import { Shield, TrendingDown, Leaf, Network, Clock, Award } from "lucide-react";
 import { motion } from "framer-motion";
 import { fadeUp, blurFocus, blurFocusContainer, viewportOnce } from "@/lib/motion";
