@@ -2,17 +2,24 @@ import { ArrowRight, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CountUp from "@/components/CountUp";
 import heroBg from "@/assets/hero-bg.jpg";
+import heroBgWebp from "@/assets/hero-bg.webp";
 
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <img
-        src={heroBg}
-        alt="Biomass field with industrial plant"
-        className="absolute inset-0 w-full h-full object-cover"
-        width={1920}
-        height={1080}
-      />
+      <picture>
+        <source srcSet={heroBgWebp} type="image/webp" />
+        <img
+          src={heroBg}
+          alt="Biomass field with industrial plant - Sustainable energy production"
+          className="absolute inset-0 w-full h-full object-cover"
+          width={1920}
+          height={1080}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
+      </picture>
       <div className="absolute inset-0 gradient-hero opacity-80" />
       <div className="absolute inset-0 bg-gradient-to-t from-charcoal/90 via-transparent to-transparent" />
 

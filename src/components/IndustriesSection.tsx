@@ -1,7 +1,6 @@
 import { Factory, UtensilsCrossed, Shirt, Blocks, Droplets, Wheat } from "lucide-react";
 import { motion } from "framer-motion";
-import { fadeUp, staggerContainer, slideFromLeft, slideFromRight, slideFromBottom, viewportOnce } from "@/lib/motion";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { fadeUp, staggerContainer, slideFromBottom, viewportOnce } from "@/lib/motion";
 
 const industries = [
   { icon: Factory, name: "Industrial Boilers", desc: "Steam & hot water generation for manufacturing" },
@@ -13,8 +12,6 @@ const industries = [
 ];
 
 const IndustriesSection = () => {
-  const isMobile = useIsMobile();
-
   return (
     <section id="industries" className="py-20 md:py-28 bg-muted overflow-hidden">
       <div className="container mx-auto px-4">
@@ -40,18 +37,13 @@ const IndustriesSection = () => {
           viewport={viewportOnce}
           variants={staggerContainer}
         >
-          {industries.map((ind, i) => {
-            const variant = isMobile
-              ? slideFromBottom
-              : i % 2 === 0
-              ? slideFromLeft
-              : slideFromRight;
+          {industries.map((ind) => {
             return (
               <motion.div
                 key={ind.name}
-                variants={variant}
+                variants={slideFromBottom}
                 whileHover={{ scale: 1.02, transition: { duration: 0.25 } }}
-                className="bg-card rounded-2xl p-6 border border-border hover:border-primary/40 transition-colors text-center group"
+                className="w-full bg-card rounded-2xl p-6 border border-border hover:border-primary/40 transition-colors text-center group"
               >
                 <div className="w-16 h-16 rounded-2xl bg-eco-light mx-auto flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <ind.icon className="h-8 w-8 text-primary" />

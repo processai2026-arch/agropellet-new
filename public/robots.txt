@@ -1,14 +1,34 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# Robots.txt for Agro Power Pellet
+# https://www.agropowerpellet.com/robots.txt
 
 User-agent: *
 Allow: /
+Allow: /assets/
+Allow: /frames/
+
+# Disallow admin or private areas (if any in future)
+# Disallow: /admin/
+# Disallow: /private/
+
+# Sitemap location
+Sitemap: https://www.agropowerpellet.com/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Specific rules for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Googlebot-Image
+Allow: /assets/
+Allow: /frames/
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1

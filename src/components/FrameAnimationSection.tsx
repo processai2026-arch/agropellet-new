@@ -3,42 +3,87 @@ import { useRef, useEffect, useState } from "react";
 const FRAME_COUNT = 240;
 const SECTION_HEIGHT = "200vh";
 const BG_COLOR = "#eef4f0";
+const PRELOAD_THRESHOLD = 0.5; // Start loading when section is 50% away from viewport
 
 /** Pad a number to 3 digits: 1 → "001" */
 const pad = (n: number) => String(n).padStart(3, "0");
 
 /** Build the URL for a given frame index (1-based). */
-const frameSrc = (i: number) => `/frames/ezgif-frame-${pad(i)}.jpg`;
+const frameSrc = (i: number) => `/frames/ezgif-frame-${pad(i)}.webp`;
 
 const FrameAnimationSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [shouldLoad, setShouldLoad] = useState(false);
 
-  /* ── Preload all 64 frames on mount ─────────────────────────── */
+  /* ── Intersection Observer to trigger loading when section is near ─────────────────────────── */
   useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting || entry.intersectionRatio > 0) {
+            setShouldLoad(true);
+            observer.disconnect(); // Only trigger once
+          }
+        });
+      },
+      {
+        rootMargin: `${window.innerHeight * PRELOAD_THRESHOLD}px`,
+        threshold: 0,
+      }
+    );
+
+    observer.observe(section);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  /* ── Lazy preload frames only when section is near viewport ─────────────────────────── */
+  useEffect(() => {
+    if (!shouldLoad) return;
+    
     let cancelled = false;
 
     const preload = async () => {
       const imgs: HTMLImageElement[] = [];
 
-      await Promise.all(
-        Array.from({ length: FRAME_COUNT }, (_, i) => {
-          return new Promise<void>((resolve) => {
-            const img = new Image();
-            img.src = frameSrc(i + 1);
-            img.onload = () => {
-              imgs[i] = img;
-              resolve();
-            };
-            img.onerror = () => resolve(); // gracefully skip broken frames
-          });
-        })
-      );
+      // Load frames in batches for better performance
+      const batchSize = 20;
+      for (let batch = 0; batch < Math.ceil(FRAME_COUNT / batchSize); batch++) {
+        if (cancelled) break;
+
+        const start = batch * batchSize;
+        const end = Math.min(start + batchSize, FRAME_COUNT);
+
+        await Promise.all(
+          Array.from({ length: end - start }, (_, i) => {
+            const frameIndex = start + i;
+            return new Promise<void>((resolve) => {
+              const img = new Image();
+              img.src = frameSrc(frameIndex + 1);
+              img.onload = () => {
+                imgs[frameIndex] = img;
+                resolve();
+              };
+              img.onerror = () => resolve(); // gracefully skip broken frames
+            });
+          })
+        );
+
+        // Update state after each batch for progressive loading
+        if (!cancelled) {
+          setImages([...imgs]);
+        }
+      }
 
       if (!cancelled) {
-        setImages(imgs);
         setLoaded(true);
       }
     };
@@ -47,7 +92,7 @@ const FrameAnimationSection = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [shouldLoad]);
 
   /* ── Draw the correct frame based on scroll position ────────── */
   useEffect(() => {

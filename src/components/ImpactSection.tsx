@@ -1,5 +1,4 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import CountUp from "@/components/CountUp";
 import { fadeUp, staggerContainer, cardItem, viewportOnce } from "@/lib/motion";
 
@@ -11,28 +10,16 @@ const stats = [
 ];
 
 const ImpactSection = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-  // Subtle slow parallax: background drifts as user scrolls
-  const bgY = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"]);
-  const bgScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.1, 1.05, 1.1]);
-
   return (
     <section
-      ref={sectionRef}
       id="impact"
-      className="py-20 md:py-28 gradient-hero relative overflow-hidden"
+      className="py-20 md:py-28 relative overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(135deg, hsl(200 10% 9%) 0%, hsl(200 8% 14%) 52%, hsl(145 42% 22%) 100%)",
+      }}
     >
-      <motion.div
-        style={{ y: bgY, scale: bgScale }}
-        className="absolute inset-0 opacity-10 will-change-transform"
-      >
-        <div className="absolute top-20 left-10 w-72 h-72 rounded-full bg-primary blur-3xl" />
-        <div className="absolute bottom-10 right-20 w-96 h-96 rounded-full bg-earth blur-3xl" />
-      </motion.div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
 
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
@@ -48,7 +35,7 @@ const ImpactSection = () => {
           <h2 className="font-display text-3xl md:text-5xl font-bold mt-3" style={{ color: 'hsl(0 0% 100%)' }}>
             Driving the Circular Economy
           </h2>
-          <p className="text-lg mt-4 max-w-2xl mx-auto" style={{ color: 'hsl(0 0% 70%)' }}>
+          <p className="text-lg mt-4 max-w-2xl mx-auto" style={{ color: 'hsl(0 0% 86%)' }}>
             Every ton of agro-residue we trade prevents open burning, reduces
             carbon emissions, and creates value for farmers and industries alike.
           </p>
@@ -66,19 +53,22 @@ const ImpactSection = () => {
               key={s.label}
               variants={cardItem}
               whileHover={{ scale: 1.02, transition: { duration: 0.25 } }}
-              className="text-center p-6 rounded-2xl border backdrop-blur-sm"
+              className="text-center p-6 rounded-2xl border backdrop-blur-sm shadow-xl"
               style={{
-                borderColor: 'hsl(0 0% 100% / 0.1)',
-                backgroundColor: 'hsl(0 0% 100% / 0.05)',
+                borderColor: 'hsl(0 0% 100% / 0.22)',
+                backgroundColor: 'hsl(0 0% 0% / 0.28)',
               }}
             >
-              <div className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-gradient-eco mb-2">
+              <div
+                className="text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-2"
+                style={{ color: 'hsl(145 70% 68%)' }}
+              >
                 <CountUp value={s.value} suffix={s.suffix} duration={2.5} />
               </div>
-              <div className="font-semibold text-sm" style={{ color: 'hsl(0 0% 90%)' }}>
+              <div className="font-semibold text-sm" style={{ color: 'hsl(0 0% 100%)' }}>
                 {s.label}
               </div>
-              <div className="text-xs mt-1" style={{ color: 'hsl(0 0% 60%)' }}>
+              <div className="text-xs mt-1" style={{ color: 'hsl(0 0% 82%)' }}>
                 {s.sub}
               </div>
             </motion.div>

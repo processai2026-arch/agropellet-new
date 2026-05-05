@@ -12,11 +12,28 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
   },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [
+    react(),
+    mode === "development" && componentTagger(),
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "@tanstack/react-query", "@tanstack/query-core"],
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['framer-motion', 'lucide-react'],
+        },
+      },
+    },
+    cssCodeSplit: true,
+    minify: 'esbuild',
+    chunkSizeWarningLimit: 1000,
+    sourcemap: false,
   },
 }));

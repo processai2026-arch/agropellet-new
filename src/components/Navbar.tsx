@@ -1,39 +1,49 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Phone } from "lucide-react";
 import logo from "@/assets/logo.png";
+import logoWebp from "@/assets/logo.webp";
 import { Button } from "@/components/ui/button";
 
-const navLinks = [
-  { label: "About", href: "#about" },
-  { label: "Products", href: "#products" },
-  { label: "Solutions", href: "#solutions" },
-  { label: "Industries", href: "#industries" },
-  { label: "Impact", href: "#impact" },
-  { label: "Contact", href: "#contact" },
-];
-
 const Navbar = () => {
-  const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [open]);
+  const scrollToContact = () => {
+    const contactSection = document.getElementById("contact");
+    contactSection?.scrollIntoView({ behavior: "smooth" });
+    setIsMobileMenuOpen(false);
+  };
+
+  const navLinks = [
+    { href: "#home", label: "Home" },
+    { href: "#about", label: "About" },
+    { href: "#products", label: "Products" },
+    { href: "#solutions", label: "Solutions" },
+    { href: "#industries", label: "Industries" },
+    { href: "#why-choose-us", label: "Why Us" },
+  ];
 
   return (
-    <>
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-background/95 backdrop-blur-lg shadow-sm' : 'bg-background/80 backdrop-blur-lg'} border-b border-border`}>
-        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 flex items-center justify-between h-14 sm:h-16">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? "bg-white/95 backdrop-blur-md shadow-lg"
+          : "bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20">
           <a href="#" className="flex items-center gap-2">
             <svg width="0" height="0" className="absolute">
-              <filter id="remove-white" color-interpolation-filters="sRGB">
+              <filter id="remove-white" colorInterpolationFilters="sRGB">
                 <feColorMatrix in="SourceGraphic" type="matrix" values="
                   1 0 0 0 0
                   0 1 0 0 0
@@ -43,79 +53,93 @@ const Navbar = () => {
                 <feComposite in="colorMask" in2="SourceGraphic" operator="in" />
               </filter>
             </svg>
-            <img src={logo} alt="Agro Power Pellet Logo" className="h-8 w-auto sm:h-10" style={{ filter: "url(#remove-white)" }} />
+            <picture>
+              <source srcSet={logoWebp} type="image/webp" />
+              <img 
+                src={logo} 
+                alt="Agro Power Pellet Logo - Biomass Pellets Manufacturer" 
+                className="h-8 w-auto sm:h-10" 
+                width="56"
+                height="56"
+                loading="eager"
+                style={{ filter: "url(#remove-white)" }} 
+              />
+            </picture>
             <span className="font-display text-lg sm:text-xl font-bold text-foreground">
               Agro Power Pellet
             </span>
           </a>
 
-          <div className="hidden lg:flex items-center gap-8">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                  isScrolled
+                    ? "text-gray-700 hover:text-green-600 hover:bg-gray-100"
+                    : "text-white hover:text-green-400 hover:bg-white/10"
+                }`}
               >
                 {link.label}
               </a>
             ))}
+            <Button
+              onClick={scrollToContact}
+              className={`ml-4 transition-all duration-300 ${
+                isScrolled
+                  ? "bg-green-500 hover:bg-green-600 text-white"
+                  : "bg-white hover:bg-gray-100 text-green-600"
+              }`}
+            >
+              Contact Us
+            </Button>
           </div>
 
-          <div className="hidden lg:flex items-center gap-3">
-            <a href="tel:+919940099060">
-              <Button variant="outline" size="sm" className="gap-2">
-                <Phone className="h-4 w-4" /> Call Now
-              </Button>
-            </a>
-            <a href="#contact">
-              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                Get Quote
-              </Button>
-            </a>
+          {/* Mobile Menu Button */}
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className={isScrolled ? "text-gray-900" : "text-white"}
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </Button>
           </div>
-
-          <button
-            className="lg:hidden p-2 -mr-2 rounded-lg hover:bg-muted transition-colors"
-            onClick={() => setOpen(!open)}
-            aria-label={open ? "Close menu" : "Open menu"}
-          >
-            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
         </div>
-      </nav>
+      </div>
 
-      {/* Mobile menu - rendered outside nav as a sibling */}
-      {open && (
-        <div className="lg:hidden fixed inset-0 top-14 z-[60] bg-background">
-          <div className="container mx-auto px-4 py-6 flex flex-col h-full">
-            <div className="space-y-1">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="block py-3 px-4 text-base font-medium text-foreground hover:text-primary hover:bg-muted rounded-xl transition-all"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-            <div className="flex gap-3 mt-6 pt-6 border-t border-border">
-              <a href="tel:+919940099060" className="flex-1">
-                <Button variant="outline" size="lg" className="w-full gap-2 rounded-xl">
-                  <Phone className="h-4 w-4" /> Call Now
-                </Button>
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-200">
+          <div className="px-4 pt-2 pb-4 space-y-2">
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                {link.label}
               </a>
-              <a href="#contact" className="flex-1" onClick={() => setOpen(false)}>
-                <Button size="lg" className="w-full bg-primary text-primary-foreground rounded-xl">
-                  Get Quote
-                </Button>
-              </a>
-            </div>
+            ))}
+            <Button
+              onClick={scrollToContact}
+              className="w-full bg-green-500 hover:bg-green-600 text-white"
+            >
+              Contact Us
+            </Button>
           </div>
         </div>
       )}
-    </>
+    </nav>
   );
 };
 
