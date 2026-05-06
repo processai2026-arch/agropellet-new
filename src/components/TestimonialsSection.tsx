@@ -1,21 +1,27 @@
 import { Star, Quote } from "lucide-react";
 import { motion } from "framer-motion";
 import { fadeUp, staggerContainer, cardItem, viewportOnce } from "@/lib/motion";
+import { useSanity } from "@/hooks/useSanity";
+import { testimonialsQuery } from "@/lib/queries";
+import type { Testimonial } from "@/lib/sanityTypes";
 
-const testimonials = [
+const FALLBACK: Testimonial[] = [
   {
+    _id: "1",
     name: "Rajesh Kumar",
     role: "Plant Manager, ABC Textiles",
     quote: "Switching to biomass fuel through Agro Power Pellet reduced our fuel costs by 28%. Their consistent supply has never disrupted our production schedule.",
     stars: 5,
   },
   {
+    _id: "2",
     name: "Priya Sharma",
     role: "Operations Head, Green Foods Pvt. Ltd.",
     quote: "The quality of biomass pellets is exceptional. We've seen significant improvements in boiler efficiency and our ESG metrics have improved dramatically.",
     stars: 5,
   },
   {
+    _id: "3",
     name: "Suresh Patel",
     role: "Owner, Modern Brick Works",
     quote: "Agro Power Pellet's supply chain reliability is unmatched. On-time deliveries and competitive pricing have made them our sole biomass supplier.",
@@ -24,6 +30,9 @@ const testimonials = [
 ];
 
 const TestimonialsSection = () => {
+  const { data } = useSanity<Testimonial[]>(testimonialsQuery);
+  const testimonials = data?.length ? data : FALLBACK;
+
   return (
     <section className="py-20 md:py-28 bg-muted overflow-hidden">
       <div className="container mx-auto px-4">
@@ -51,14 +60,14 @@ const TestimonialsSection = () => {
         >
           {testimonials.map((t) => (
             <motion.div
-              key={t.name}
+              key={t._id}
               variants={cardItem}
               whileHover={{ scale: 1.02, transition: { duration: 0.25 } }}
               className="bg-card rounded-2xl p-8 border border-border relative hover:border-primary/40 transition-colors"
             >
               <Quote className="absolute top-6 right-6 h-8 w-8 text-primary/15" />
               <div className="flex gap-1 mb-4">
-                {Array.from({ length: t.stars }).map((_, i) => (
+                {Array.from({ length: t.stars ?? 5 }).map((_, i) => (
                   <Star key={i} className="h-4 w-4 fill-earth text-earth" />
                 ))}
               </div>

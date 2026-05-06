@@ -1,17 +1,27 @@
 import { Factory, UtensilsCrossed, Shirt, Blocks, Droplets, Wheat } from "lucide-react";
 import { motion } from "framer-motion";
 import { fadeUp, staggerContainer, slideFromBottom, viewportOnce } from "@/lib/motion";
+import { useSanity } from "@/hooks/useSanity";
+import { industriesQuery } from "@/lib/queries";
+import type { Industry } from "@/lib/sanityTypes";
 
-const industries = [
-  { icon: Factory, name: "Industrial Boilers", desc: "Steam & hot water generation for manufacturing" },
-  { icon: UtensilsCrossed, name: "Food Processing", desc: "Drying, roasting, and thermal processing" },
-  { icon: Shirt, name: "Textiles & Dyeing", desc: "Steam for dyeing, finishing, and laundering" },
-  { icon: Blocks, name: "Brick Kilns", desc: "High-temperature firing with consistent fuel" },
-  { icon: Droplets, name: "Chemical Plants", desc: "Process heating and thermal utilities" },
-  { icon: Wheat, name: "Agro Industries", desc: "Rice mills, oil mills, and sugar refineries" },
+const ICON_MAP: Record<string, React.ElementType> = {
+  Factory, UtensilsCrossed, Shirt, Blocks, Droplets, Wheat,
+};
+
+const FALLBACK: Industry[] = [
+  { _id: "1", iconName: "Factory", name: "Industrial Boilers", description: "Steam & hot water generation for manufacturing" },
+  { _id: "2", iconName: "UtensilsCrossed", name: "Food Processing", description: "Drying, roasting, and thermal processing" },
+  { _id: "3", iconName: "Shirt", name: "Textiles & Dyeing", description: "Steam for dyeing, finishing, and laundering" },
+  { _id: "4", iconName: "Blocks", name: "Brick Kilns", description: "High-temperature firing with consistent fuel" },
+  { _id: "5", iconName: "Droplets", name: "Chemical Plants", description: "Process heating and thermal utilities" },
+  { _id: "6", iconName: "Wheat", name: "Agro Industries", description: "Rice mills, oil mills, and sugar refineries" },
 ];
 
 const IndustriesSection = () => {
+  const { data } = useSanity<Industry[]>(industriesQuery);
+  const industries = data?.length ? data : FALLBACK;
+
   return (
     <section id="industries" className="py-20 md:py-28 bg-muted overflow-hidden">
       <div className="container mx-auto px-4">
@@ -38,20 +48,21 @@ const IndustriesSection = () => {
           variants={staggerContainer}
         >
           {industries.map((ind) => {
+            const Icon = ICON_MAP[ind.iconName ?? ""] ?? Factory;
             return (
               <motion.div
-                key={ind.name}
+                key={ind._id}
                 variants={slideFromBottom}
                 whileHover={{ scale: 1.02, transition: { duration: 0.25 } }}
                 className="w-full bg-card rounded-2xl p-6 border border-border hover:border-primary/40 transition-colors text-center group"
               >
                 <div className="w-16 h-16 rounded-2xl bg-eco-light mx-auto flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <ind.icon className="h-8 w-8 text-primary" />
+                  <Icon className="h-8 w-8 text-primary" />
                 </div>
                 <h3 className="font-display text-lg font-bold text-card-foreground">
                   {ind.name}
                 </h3>
-                <p className="text-muted-foreground text-sm mt-2">{ind.desc}</p>
+                <p className="text-muted-foreground text-sm mt-2">{ind.description}</p>
               </motion.div>
             );
           })}

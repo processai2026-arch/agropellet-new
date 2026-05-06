@@ -4,6 +4,9 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { fadeUp, viewportOnce, easeSoft } from "@/lib/motion";
 import { useToast } from "@/hooks/use-toast";
+import { useSanity } from "@/hooks/useSanity";
+import { contactQuery } from "@/lib/queries";
+import type { ContactData } from "@/lib/sanityTypes";
 
 const formContainer = {
   hidden: {},
@@ -15,22 +18,37 @@ const formItem = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeSoft } },
 };
 
+const FALLBACK: Required<ContactData> = {
+  contactName: "Mr. M. G. Sankkar",
+  role: "Founder & Managing Director",
+  phone: "919940099060",
+  whatsapp: "919940099060",
+  email: "",
+  location: "Tamil Nadu, India",
+};
+
 const ContactSection = () => {
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { data } = useSanity<ContactData>(contactQuery);
+
+  const contact = {
+    contactName: data?.contactName ?? FALLBACK.contactName,
+    role: data?.role ?? FALLBACK.role,
+    phone: data?.phone ?? FALLBACK.phone,
+    whatsapp: data?.whatsapp ?? FALLBACK.whatsapp,
+    email: data?.email ?? FALLBACK.email,
+    location: data?.location ?? FALLBACK.location,
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Build the WhatsApp message
     const text = `🌿 *New Enquiry from Website*%0A%0A*Name:* ${formData.name}%0A*Phone:* ${formData.phone}%0A*Email:* ${formData.email}%0A*Message:* ${formData.message}`;
-    
-    // Open WhatsApp with the message (sends to owner's number)
-    window.open(`https://wa.me/919940099060?text=${text}`, "_blank");
+    window.open(`https://wa.me/${contact.whatsapp}?text=${text}`, "_blank");
 
-    // Show success popup to the user
     toast({
       title: "Message Sent Successfully!",
       description: "We have received your message and will contact you within 2 hours.",
@@ -70,15 +88,15 @@ const ContactSection = () => {
           >
             <motion.div variants={formItem} className="mb-8">
               <h3 className="font-display text-xl font-bold text-foreground mb-1">
-                Mr. M. G. Sankkar
+                {contact.contactName}
               </h3>
-              <p className="text-muted-foreground">Founder & Managing Director</p>
+              <p className="text-muted-foreground">{contact.role}</p>
             </motion.div>
 
             <div className="space-y-4">
               <motion.a
                 variants={formItem}
-                href="tel:+919940099060"
+                href={`tel:+${contact.phone}`}
                 className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-primary/40 transition-all"
               >
                 <div className="w-12 h-12 rounded-xl gradient-eco flex items-center justify-center">
@@ -86,13 +104,13 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <div className="font-semibold text-card-foreground">Call Now</div>
-                  <div className="text-muted-foreground text-sm">+91 9940099060</div>
+                  <div className="text-muted-foreground text-sm">+{contact.phone}</div>
                 </div>
               </motion.a>
 
               <motion.a
                 variants={formItem}
-                href="https://wa.me/919940099060"
+                href={`https://wa.me/${contact.whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-primary/40 transition-all"
@@ -115,7 +133,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <div className="font-semibold text-card-foreground">Location</div>
-                  <div className="text-muted-foreground text-sm">Tamil Nadu, India</div>
+                  <div className="text-muted-foreground text-sm">{contact.location}</div>
                 </div>
               </motion.div>
             </div>

@@ -1,15 +1,21 @@
 import { motion } from "framer-motion";
 import CountUp from "@/components/CountUp";
 import { fadeUp, staggerContainer, cardItem, viewportOnce } from "@/lib/motion";
+import { useSanity } from "@/hooks/useSanity";
+import { impactQuery } from "@/lib/queries";
+import type { ImpactStat } from "@/lib/sanityTypes";
 
-const stats = [
-  { value: 30, suffix: "%", label: "Average Fuel Cost Savings", sub: "for our industrial clients" },
-  { value: 5000, suffix: "+", label: "Tons CO₂ Reduced", sub: "annually through biomass adoption" },
-  { value: 10000, suffix: "+", label: "Tons Biomass Supplied", sub: "turning waste into valuable energy" },
-  { value: 100, suffix: "+", label: "Farmer Livelihoods", sub: "supported through agro-residue procurement" },
+const FALLBACK: ImpactStat[] = [
+  { _id: "1", value: 30, suffix: "%", label: "Average Fuel Cost Savings", sub: "for our industrial clients" },
+  { _id: "2", value: 5000, suffix: "+", label: "Tons CO₂ Reduced", sub: "annually through biomass adoption" },
+  { _id: "3", value: 10000, suffix: "+", label: "Tons Biomass Supplied", sub: "turning waste into valuable energy" },
+  { _id: "4", value: 100, suffix: "+", label: "Farmer Livelihoods", sub: "supported through agro-residue procurement" },
 ];
 
 const ImpactSection = () => {
+  const { data } = useSanity<ImpactStat[]>(impactQuery);
+  const stats = data?.length ? data : FALLBACK;
+
   return (
     <section
       id="impact"
@@ -29,15 +35,15 @@ const ImpactSection = () => {
           viewport={viewportOnce}
           variants={fadeUp}
         >
-          <span className="text-sm font-semibold uppercase tracking-wider text-primary" style={{ color: 'hsl(145 63% 55%)' }}>
+          <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: "hsl(145 63% 55%)" }}>
             Our Impact
           </span>
-          <h2 className="font-display text-3xl md:text-5xl font-bold mt-3" style={{ color: 'hsl(0 0% 100%)' }}>
+          <h2 className="font-display text-3xl md:text-5xl font-bold mt-3" style={{ color: "hsl(0 0% 100%)" }}>
             Driving the Circular Economy
           </h2>
-          <p className="text-lg mt-4 max-w-2xl mx-auto" style={{ color: 'hsl(0 0% 86%)' }}>
-            Every ton of agro-residue we trade prevents open burning, reduces
-            carbon emissions, and creates value for farmers and industries alike.
+          <p className="text-lg mt-4 max-w-2xl mx-auto" style={{ color: "hsl(0 0% 86%)" }}>
+            Every ton of agro-residue we trade prevents open burning, reduces carbon emissions,
+            and creates value for farmers and industries alike.
           </p>
         </motion.div>
 
@@ -50,25 +56,25 @@ const ImpactSection = () => {
         >
           {stats.map((s) => (
             <motion.div
-              key={s.label}
+              key={s._id}
               variants={cardItem}
               whileHover={{ scale: 1.02, transition: { duration: 0.25 } }}
               className="text-center p-6 rounded-2xl border backdrop-blur-sm shadow-xl"
               style={{
-                borderColor: 'hsl(0 0% 100% / 0.22)',
-                backgroundColor: 'hsl(0 0% 0% / 0.28)',
+                borderColor: "hsl(0 0% 100% / 0.22)",
+                backgroundColor: "hsl(0 0% 0% / 0.28)",
               }}
             >
               <div
                 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold mb-2"
-                style={{ color: 'hsl(145 70% 68%)' }}
+                style={{ color: "hsl(145 70% 68%)" }}
               >
-                <CountUp value={s.value} suffix={s.suffix} duration={2.5} />
+                <CountUp value={s.value ?? 0} suffix={s.suffix ?? ""} duration={2.5} />
               </div>
-              <div className="font-semibold text-sm" style={{ color: 'hsl(0 0% 100%)' }}>
+              <div className="font-semibold text-sm" style={{ color: "hsl(0 0% 100%)" }}>
                 {s.label}
               </div>
-              <div className="text-xs mt-1" style={{ color: 'hsl(0 0% 82%)' }}>
+              <div className="text-xs mt-1" style={{ color: "hsl(0 0% 82%)" }}>
                 {s.sub}
               </div>
             </motion.div>
