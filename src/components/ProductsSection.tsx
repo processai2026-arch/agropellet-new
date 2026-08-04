@@ -5,27 +5,28 @@ import { productsQuery } from "@/lib/queries";
 import { urlFor } from "@/lib/imageBuilder";
 import type { Product } from "@/lib/sanityTypes";
 
-// Fallback static products (unchanged from original)
+// The canonical product list. Sanity may override a card's copy or image, but
+// this array decides which products exist and in what order.
 import sawDust from "@/assets/products/saw-dust.webp";
 import coffeeHusk from "@/assets/products/coffee-husk.webp";
 import riceHusk from "@/assets/products/rice-husk.webp";
 import groundnutShell from "@/assets/products/groundnut-shell.webp";
 import wasteWood from "@/assets/products/waste-wood.webp";
 import cornCob from "@/assets/products/corn-cob.webp";
-import cornStalk from "@/assets/products/corn-stalk.webp";
-import stovesBurners from "@/assets/products/stoves-burners.webp";
+import biomassBurner from "@/assets/products/biomass-burner.webp";
+import biomassStove from "@/assets/products/biomass-stove.webp";
 import biomassPellet from "@/assets/biomass-pellet.webp";
 
-const FALLBACK_PRODUCTS = [
-  { _id: "1", name: "Saw Dust", description: "Fine wood particles ideal for boiler fuel and pellet manufacturing", image: sawDust },
-  { _id: "2", name: "Coffee Husk", description: "High-calorific agricultural byproduct from coffee processing", image: coffeeHusk },
-  { _id: "3", name: "Rice Husk", description: "Abundant agro-residue perfect for thermal energy generation", image: riceHusk },
-  { _id: "4", name: "Groundnut Shell", description: "Excellent biomass fuel with consistent burning properties", image: groundnutShell },
-  { _id: "5", name: "Waste Wood", description: "Recycled wood materials for sustainable energy production", image: wasteWood },
-  { _id: "6", name: "Corn Cob", description: "Dense biomass fuel with high heat output per unit", image: cornCob },
-  { _id: "7", name: "Corn Stalk", description: "Versatile agricultural waste for industrial combustion", image: cornStalk },
-  { _id: "8", name: "Biomass Pellets", description: "Compressed, uniform fuel for automated boiler systems", image: biomassPellet },
-  { _id: "9", name: "Stoves & Burners", description: "Efficient biomass combustion equipment for industries", image: stovesBurners },
+const PRODUCTS = [
+  { _id: "1", name: "Biomass Pellets", description: "Compressed, uniform fuel for automated boiler systems", image: biomassPellet },
+  { _id: "2", name: "Biomass Stove", description: "Clean-burning biomass stove for commercial kitchens and heating", image: biomassStove },
+  { _id: "3", name: "Biomass Burner", description: "Automated industrial burner for boilers, dryers and thermic heaters", image: biomassBurner },
+  { _id: "4", name: "Saw Dust", description: "Fine wood particles ideal for boiler fuel and pellet manufacturing", image: sawDust },
+  { _id: "5", name: "Coffee Husk", description: "High-calorific agricultural byproduct from coffee processing", image: coffeeHusk },
+  { _id: "6", name: "Rice Husk", description: "Abundant agro-residue perfect for thermal energy generation", image: riceHusk },
+  { _id: "7", name: "Groundnut Shell", description: "Excellent biomass fuel with consistent burning properties", image: groundnutShell },
+  { _id: "8", name: "Waste Wood", description: "Recycled wood materials for sustainable energy production", image: wasteWood },
+  { _id: "9", name: "Corn Cob", description: "Dense biomass fuel with high heat output per unit", image: cornCob },
 ];
 
 interface RenderProduct {
@@ -39,21 +40,18 @@ interface RenderProduct {
 const ProductsSection = () => {
   const { data, loading } = useSanity<Product[]>(productsQuery);
 
-  const products: RenderProduct[] = data?.length
-    ? data.map((p, i) => ({
-        _id: p._id,
-        name: p.name ?? FALLBACK_PRODUCTS[i]?.name ?? "",
-        description: p.description ?? FALLBACK_PRODUCTS[i]?.description ?? "",
-        sanityImage: p.image ?? null,
-        fallbackImage: FALLBACK_PRODUCTS[i]?.image ?? biomassPellet,
-      }))
-    : FALLBACK_PRODUCTS.map((p) => ({
-        _id: p._id,
-        name: p.name,
-        description: p.description,
-        sanityImage: null,
-        fallbackImage: p.image as string,
-      }));
+  // Match CMS documents to local products by name rather than by position, so a
+  // stale or missing Sanity entry can never drop a product from the grid.
+  const products: RenderProduct[] = PRODUCTS.map((p) => {
+    const match = data?.find((d) => d.name?.trim().toLowerCase() === p.name.toLowerCase());
+    return {
+      _id: p._id,
+      name: match?.name ?? p.name,
+      description: match?.description ?? p.description,
+      sanityImage: match?.image ?? null,
+      fallbackImage: p.image as string,
+    };
+  });
 
   return (
     <section id="products" className="py-20 md:py-28 bg-muted overflow-hidden">
@@ -104,7 +102,7 @@ const ProductsSection = () => {
           >
             {products.map((p) => {
               const imgUrl = p.sanityImage
-                ? urlFor(p.sanityImage).width(800).height(800).fit("fill").bg("f8f8f8").quality(80).url()
+                ? urlFor(p.sanityImage).width(800).height(800).fit("crop").quality(80).url()
                 : p.fallbackImage;
 
               return (
